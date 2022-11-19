@@ -1,0 +1,43 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.5'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'org.openapi.generator' version '4.3.1'
+}
+
+group = 'com.simontech'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'io.swagger.parser.v3:swagger-parser:2.1.8'
+	implementation 'org.openapitools:jackson-databind-nullable:0.2.4'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "$projectDir/src/main/resources/service.yml"
+	outputDir = "$buildDir/generated"
+	apiPackage = "org.simontech.openapi.api"
+	invokerPackage = "org.simontech.openapi"
+	modelPackage = "org.simontech.openapi.model"
+	configOptions = [
+	        dateLibrary: "java8",
+			interfaceOnly: "true"
+	]
+}
+
+compileJava.dependsOn tasks.openApiGenerate
+sourceSets.main.java.srcDir "$buildDir/generated/src/main/java"
+sourceSets.main.resources.srcDir "$buildDir/generated/src/main/resources"
